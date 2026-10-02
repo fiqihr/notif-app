@@ -3,7 +3,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { messaging, db } from "@/lib/firebase";
-import { getToken } from "firebase/messaging";
+import { getToken, onMessage } from "firebase/messaging";
 import { doc, updateDoc, collection, addDoc, query, where, onSnapshot, Timestamp, deleteDoc } from "firebase/firestore";
 
 export default function Home() {
@@ -87,6 +87,26 @@ export default function Home() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
+
+  // Listener untuk Notifikasi Foreground (saat web/PWA sedang terbuka)
+  useEffect(() => {
+    if (typeof window !== "undefined" && messaging) {
+      const unsubscribe = onMessage(messaging, (payload) => {
+        console.log("Pesan diterima di Foreground:", payload);
+        // Tampilkan notifikasi secara manual lewat Service Worker
+        if ("serviceWorker" in navigator) {
+          navigator.serviceWorker.ready.then((registration) => {
+            registration.showNotification(payload.notification.title, {
+              body: payload.notification.body,
+              icon: '/icon.jpg',
+              vibrate: [200, 100, 200, 100, 200, 100, 200],
+            });
+          });
+        }
+      });
+      return () => unsubscribe();
+    }
+  }, []);
 
   const requestNotificationPermission = async (silent = false) => {
     try {
