@@ -16,13 +16,8 @@ const messaging = firebase.messaging();
 
 messaging.onBackgroundMessage(function(payload) {
   console.log('[firebase-messaging-sw.js] Menerima pesan di background ', payload);
-  
-  const notificationTitle = payload.notification.title;
-  const notificationOptions = {
-    body: payload.notification.body,
-    icon: '/favicon.ico', // Gunakan icon bawaan Next.js sementara
-    vibrate: [200, 100, 200, 100, 200, 100, 200], // Pola getar keren
-  };
-
-  self.registration.showNotification(notificationTitle, notificationOptions);
+  // HAPUS showNotification manual di sini.
+  // Karena payload dari server sudah memiliki objek "notification", 
+  // Firebase SDK akan secara OTOMATIS menampilkannya ke layar.
+  // Jika kita panggil showNotification lagi, maka akan muncul 2x!
 });

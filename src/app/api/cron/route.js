@@ -54,6 +54,10 @@ export async function GET(request) {
             body: task.description || 'Waktunya mengerjakan tugasmu!',
           },
           webpush: {
+            notification: {
+              icon: '/favicon.ico',
+              vibrate: [200, 100, 200, 100, 200, 100, 200]
+            },
             fcmOptions: {
               link: '/' // Buka web saat notifikasi diklik
             }
