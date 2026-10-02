@@ -15,6 +15,7 @@ export default function Home() {
   const [tasks, setTasks] = useState([]);
   const [form, setForm] = useState({ title: "", description: "", date: "", time: "" });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showAllTasks, setShowAllTasks] = useState(false);
 
   // Fetch data secara real-time
   useEffect(() => {
@@ -26,8 +27,12 @@ export default function Home() {
     const unsubscribe = onSnapshot(q, (snapshot) => {
       const tasksData = [];
       snapshot.forEach((doc) => tasksData.push({ id: doc.id, ...doc.data() }));
-      // Urutkan berdasarkan waktu di client-side untuk menghindari error index Firestore
-      tasksData.sort((a, b) => a.scheduledTime.toMillis() - b.scheduledTime.toMillis());
+      // Urutkan berdasarkan waktu pembuatan terbaru (descending)
+      tasksData.sort((a, b) => {
+        const timeA = a.createdAt ? a.createdAt.toMillis() : a.scheduledTime.toMillis();
+        const timeB = b.createdAt ? b.createdAt.toMillis() : b.scheduledTime.toMillis();
+        return timeB - timeA;
+      });
       setTasks(tasksData);
     });
     return () => unsubscribe();
@@ -249,7 +254,7 @@ export default function Home() {
               </div>
             ) : (
               <div className="grid gap-4">
-                {tasks.map(task => {
+                {(showAllTasks ? tasks : tasks.slice(0, 5)).map(task => {
                   const date = task.scheduledTime?.toDate() || new Date();
                   const isPast = date < new Date() && !task.isNotified;
                   
@@ -288,6 +293,24 @@ export default function Home() {
                     </div>
                   )
                 })}
+                
+                {/* Tombol Lihat Lainnya */}
+                {tasks.length > 5 && !showAllTasks && (
+                  <button 
+                    onClick={() => setShowAllTasks(true)} 
+                    className="text-cyan-400 hover:text-cyan-300 w-full py-4 text-sm font-semibold transition-colors bg-white/5 hover:bg-white/10 rounded-2xl border border-white/5 mt-2"
+                  >
+                    Lihat {tasks.length - 5} Notifikasi Lainnya
+                  </button>
+                )}
+                {showAllTasks && tasks.length > 5 && (
+                  <button 
+                    onClick={() => setShowAllTasks(false)} 
+                    className="text-zinc-500 hover:text-zinc-300 w-full py-4 text-sm font-semibold transition-colors bg-white/5 hover:bg-white/10 rounded-2xl border border-white/5 mt-2"
+                  >
+                    Sembunyikan
+                  </button>
+                )}
               </div>
             )}
           </div>
