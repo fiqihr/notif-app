@@ -14,6 +14,8 @@ const geistMono = Geist_Mono({
 export const metadata = {
   title: "NotifApp | Jadwalkan Harimu",
   description: "Aplikasi pengingat pintar berbasis web push notification.",
+  manifest: "/manifest.json",
+  themeColor: "#06b6d4",
 };
 
 import { AuthProvider } from "@/contexts/AuthContext";

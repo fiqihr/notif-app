@@ -21,3 +21,8 @@ messaging.onBackgroundMessage(function(payload) {
   // Firebase SDK akan secara OTOMATIS menampilkannya ke layar.
   // Jika kita panggil showNotification lagi, maka akan muncul 2x!
 });
+
+// Dummy fetch event listener agar Chrome mengizinkan instalasi PWA
+self.addEventListener('fetch', function(event) {
+  // Biarkan browser menangani fetch secara normal
+});
